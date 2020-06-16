@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'quizBank.dart';
+import 'package:rflutter_alert/rflutter_alert.dart';
+//TODO: Step 2 - Import the rFlutter_Alert package here.
+import 'quiz_brain.dart';
+
+QuizBrain quizBrain = QuizBrain();
 
 void main() => runApp(Quizzler());
 
@@ -7,6 +11,7 @@ class Quizzler extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: Colors.grey.shade900,
         body: SafeArea(
@@ -26,34 +31,48 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
-
   List<Icon> scoreKeeper = [];
 
-  void checkAnswer(bool userAnswer){
-    bool answer = quizBank.getQuestionAnswer();
-    setState((){
-      if(userAnswer == answer){
-        scoreKeeper.add(
-            Icon(
-              Icons.check,
-              color: Colors.green,
-            )
-        );
+  void checkAnswer(bool userPickedAnswer) {
+    bool correctAnswer = quizBrain.getCorrectAnswer();
+
+    setState(() {
+      //TODO: Step 4 - Use IF/ELSE to check if we've reached the end of the quiz. If true, execute Part A, B, C, D.
+      if(quizBrain.isFinished()==true){
+        print("Button");
+        Alert(
+            context: context,
+            title: "Complete",
+            desc: "You have finished the quiz.")
+            .show();
+
+        quizBrain.reset();
+
+        scoreKeeper.clear();
       }
       else{
-        scoreKeeper.add(
-            Icon(
-              Icons.close,
-              color: Colors.red,
-            )
-        );
+        if (userPickedAnswer == correctAnswer) {
+          scoreKeeper.add(Icon(
+            Icons.check,
+            color: Colors.green,
+          ));
+        } else {
+          scoreKeeper.add(Icon(
+            Icons.close,
+            color: Colors.red,
+          ));
+        }
+        quizBrain.nextQuestion();
       }
-      quizBank.getNextNumber();
+      //TODO: Step 4 Part A - show an alert using rFlutter_alert (remember to read the docs for the package!)
+      //HINT! Step 4 Part B is in the quiz_brain.dart
+      //TODO: Step 4 Part C - reset the questionNumber,
+      //TODO: Step 4 Part D - empty out the scoreKeeper.
+
+      //TODO: Step 5 - If we've not reached the end, ELSE do the answer checking steps below 👇
+
     });
   }
-
-  QuizBank quizBank = QuizBank();
-
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +81,12 @@ class _QuizPageState extends State<QuizPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Expanded(
-          flex: 4,
+          flex: 5,
           child: Padding(
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                quizBank.getQuestionText(),
+                quizBrain.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -119,11 +138,11 @@ class _QuizPageState extends State<QuizPage> {
         Row(
           children: scoreKeeper,
         )
-        //TODO: Add a Row here as your score keeper
       ],
     );
   }
 }
+
 
 /*
 question1: 'You can lead a cow down stairs but not up stairs.', false,
