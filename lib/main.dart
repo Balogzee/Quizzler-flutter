@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'quizBank.dart';
 
 void main() => runApp(Quizzler());
 
@@ -25,6 +26,35 @@ class QuizPage extends StatefulWidget {
 }
 
 class _QuizPageState extends State<QuizPage> {
+
+  List<Icon> scoreKeeper = [];
+
+  void checkAnswer(bool userAnswer){
+    bool answer = quizBank.getQuestionAnswer();
+    setState((){
+      if(userAnswer == answer){
+        scoreKeeper.add(
+            Icon(
+              Icons.check,
+              color: Colors.green,
+            )
+        );
+      }
+      else{
+        scoreKeeper.add(
+            Icon(
+              Icons.close,
+              color: Colors.red,
+            )
+        );
+      }
+      quizBank.getNextNumber();
+    });
+  }
+
+  QuizBank quizBank = QuizBank();
+
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -32,12 +62,12 @@ class _QuizPageState extends State<QuizPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: <Widget>[
         Expanded(
-          flex: 5,
+          flex: 4,
           child: Padding(
             padding: EdgeInsets.all(10.0),
             child: Center(
               child: Text(
-                'This is where the question text will go.',
+                quizBank.getQuestionText(),
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 25.0,
@@ -62,6 +92,7 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked true.
+                checkAnswer(true);
               },
             ),
           ),
@@ -80,10 +111,14 @@ class _QuizPageState extends State<QuizPage> {
               ),
               onPressed: () {
                 //The user picked false.
+                checkAnswer(false);
               },
             ),
           ),
         ),
+        Row(
+          children: scoreKeeper,
+        )
         //TODO: Add a Row here as your score keeper
       ],
     );
